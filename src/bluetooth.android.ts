@@ -1041,6 +1041,17 @@ export class Bluetooth extends BluetoothCommon {
         }
         return this._bluetoothGattCallback;
     }
+    
+    // for beacon support
+    get bluetoothAdvertiser() {
+        if (!this._bluetoothAdvertiser) {
+            this._bluetoothAdvertiser = this._adapter.getBluetoothLeAdvertiser();
+        }
+        return this._bluetoothAdvertiser;
+    }
+    private _bluetoothAdvertiser: android.bluetooth.le.BluetoothLeAdvertiser;
+    private beaconAdvertiseCb = new MyAdvertiseCallback();
+        
     // not initializing here, if the Android API is < 21  use LeScanCallback
     private scanCallback: ScanCallback;
     private LeScanCallback: LeScanCallback;
@@ -2671,5 +2682,75 @@ export class Bluetooth extends BluetoothCommon {
         } else {
             return activity;
         }
+    }
+
+    /*
+     * Beacon support
+     */
+    @bluetoothEnabled
+    public startBeaconAdvertising(serviceUuid, serviceData, name) {
+        function toByte(a) {
+            //a = parseInt(a);
+            a = (a << 8) >> 8;
+            return a;
+        }
+        console.log('startAdvertising()', {serviceUuid, serviceData, name});
+        // cf https://github.com/vhiribarren/beacon-simulator-android/blob/15309411cb3887164d6b02a3ab6f5fca31a0a5a3/app/src/main/java/net/alea/beaconsimulator/bluetooth/model/Settings.java
+        let builder = new android.bluetooth.le.AdvertiseSettings.Builder();
+        builder.setAdvertiseMode(android.bluetooth.le.AdvertiseSettings.ADVERTISE_TX_POWER_LOW);
+
+        let advertiseSetting = builder.build();
+
+        // cf https://github.com/vhiribarren/beacon-simulator-android/blob/15309411cb3887164d6b02a3ab6f5fca31a0a5a3/app/src/main/java/net/alea/beaconsimulator/bluetooth/model/EddystoneUID.java#L120
+        this._adapter.setName(name);
+        let UUID = android.os.ParcelUuid.fromString(serviceUuid);
+        let advertiseData = new android.bluetooth.le.AdvertiseData.Builder()
+        .addServiceUuid(UUID)
+        .setIncludeDeviceName(true)
+        .setIncludeTxPowerLevel(true)
+        //.addServiceData(UUID, [toByte(serviceData), 0x00])
+        .build();
+        console.log('startAdvertising() ', {advertiseSetting, advertiseData});
+        let btAdvertiser = this._adapter.getBluetoothLeAdvertiser();
+        if (btAdvertiser) {
+            btAdvertiser.startAdvertising(advertiseSetting, advertiseData, this.beaconAdvertiseCb);
+        } else {
+            console.log("btAdvertiser is null !!");
+        }
+    }
+
+    @bluetoothEnabled
+    public stopBeaconAdvertising() {
+        console.log('stopAdvertising()');
+        this._adapter.getBluetoothLeAdvertiser().stopAdvertising(this.beaconAdvertiseCb);
+    }
+}
+
+// cf https://github.com/vhiribarren/beacon-simulator-android/blob/15309411cb3887164d6b02a3ab6f5fca31a0a5a3/app/src/main/java/net/alea/beaconsimulator/bluetooth/BeaconSimulatorService.java
+class MyAdvertiseCallback extends android.bluetooth.le.AdvertiseCallback {
+
+    public MyAdvertiseCallback() {
+    }
+
+    public onStartSuccess(_settingsInEffect) {
+        console.log("Success in starting broadcast ", {_settingsInEffect});
+    }
+
+    public onStartFailure(errorCode) {
+        let str = "UNKNOWN_ERROR_CODE";
+        let codes = [
+            'ADVERTISE_SUCCESS', // 0
+            'ADVERTISE_FAILED_DATA_TOO_LARGE', // 1
+            'ADVERTISE_FAILED_TOO_MANY_ADVERTISERS', // 2
+            'ADVERTISE_FAILED_ALREADY_STARTED', // 3
+            'ADVERTISE_FAILED_INTERNAL_ERROR', // 4
+            'ADVERTISE_FAILED_FEATURE_UNSUPPORTED', // 5
+        ]
+        try {
+            str = codes[errorCode];
+        } catch (e) {
+            str = "UNKNOWN_ERROR_CODE";
+        }
+        console.log("Error starting broadcasting:", {errorCode, str});
     }
 }

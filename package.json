@@ -10,6 +10,7 @@
         "tslint": "tslint \"src/**/*.ts\" --config tslint.json --exclude \"**/node_modules/**\"",
         "plugin.tscwatch": "npm run tsc -- -w",
         "demo.ios": "npm i && npm run tsc && cd demo && tns run ios",
+        "debug.android": "npm i && npm run tsc && cd demo && tns debug android",
         "demo.android": "npm i && npm run tsc && cd demo && tns run android",
         "demo.reset": "cd demo && rimraf platforms",
         "plugin.prepare": "npm run tsc && cd demo && tns plugin remove nativescript-bluetooth && tns plugin add ../plugin",
