@@ -2,18 +2,21 @@
   "nativescript": {
     "id": "org.nativescript.bluetoothdemo",
     "tns-ios": {
-      "version": "6.1.1"
+      "version": "6.5.0"
+    },
+    "tns-android": {
+      "version": "6.5.0"
     }
   },
   "dependencies": {
     "nativescript-bluetooth": "file:../plugin",
     "nativescript-gps": "1.2.18",
     "nativescript-theme-core": "^2.0.24",
-    "tns-core-modules": "~6.1.2"
+    "tns-core-modules": "~6.5.0"
   },
   "devDependencies": {
     "nativescript-css-loader": "~0.26.1",
-    "nativescript-dev-webpack": "~1.2.1",
+    "nativescript-dev-webpack": "~1.5.1",
     "tns-platform-declarations": "~6.1.2",
     "ts-loader": "~6.2.0",
     "typescript": "3.4.5",

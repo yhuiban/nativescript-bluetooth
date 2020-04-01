@@ -2,7 +2,10 @@
   "name": "bluetooth",
   "main": "app.js",
   "version": "1.5.1",
-  "author": { "name": "Telerik", "email": "support@telerik.com" },
+  "author": {
+    "name": "Telerik",
+    "email": "support@telerik.com"
+  },
   "description": "Nativescript hello-world project template",
   "license": "Apache-2.0",
   "keywords": [
@@ -22,7 +25,10 @@
     "url": "https://github.com/NativeScript/template-hello-world/issues"
   },
   "homepage": "https://github.com/NativeScript/template-hello-world",
-  "android": { "v8Flags": "--expose_gc" },
+  "android": {
+    "v8Flags": "--expose_gc",
+    "markingMode": "none"
+  },
   "readme": "ERROR: No README data found!",
   "_id": "tns-template-hello-world@1.5.1",
   "_from": "tns-template-hello-world@1.5.1"
